@@ -30,7 +30,7 @@ Names cleaned up, duplicate notes removed.
 45:00 Playing A1 (drone) + E3 C#4 F#3 for 2 minutes
 47:00 Playing A1 (drone) + B4 C#4 G#3 for 2 minutes
 49:00 Playing A1 (drone) + B4 C#4 E3 G#3 for 2 minutes
-51:00 Playing A1 (drone) + G#3 E3 G#3 B4 for 2 minutes
+51:00 Playing A1 (drone) + E3 G#3 B4 for 2 minutes
 53:00 Playing A1 (drone) + B4 E3 F#3 F#4 for 3 minutes
 56:00 Playing A1 (drone) + F#4 E3 F#3 for 1 minute
 57:00 Playing A1 (drone) + F#4 E35 for 1 minute
