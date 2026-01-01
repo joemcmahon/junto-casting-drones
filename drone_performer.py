@@ -358,9 +358,14 @@ class MIDIPerformer:
             if i < steps:
                 time.sleep(duration / steps)
 
-    def _update_notes(self, new_notes: Set[str], drone: str) -> tuple[list, list]:
+    def _update_notes(self, new_notes: Set[str], drone: str, skip_fades: bool = False) -> tuple[list, list]:
         """
         Update which notes are playing
+
+        Args:
+            new_notes: Set of notes that should be playing
+            drone: The drone note for this bracket
+            skip_fades: If True, skip individual note fades (used during global fade-in)
 
         Returns:
             (stopped_notes, started_notes) - lists of (note, channel) tuples
@@ -372,8 +377,9 @@ class MIDIPerformer:
         if self.current_drone != drone:
             # Drone is changing
             if self.current_drone is not None:
-                # Fade out and stop the old drone
-                self._fade_channel_out(0, self.drone_fade_out)
+                # Fade out and stop the old drone (unless skipping fades)
+                if not skip_fades:
+                    self._fade_channel_out(0, self.drone_fade_out)
                 self._send_note_off(self.current_drone, 0)
                 self.active_notes.discard(self.current_drone)
                 stopped_notes.append((self.current_drone, 0))
@@ -386,15 +392,17 @@ class MIDIPerformer:
             self.active_notes.add(drone)
             self.current_drone = drone
             started_notes.append((drone, 0))
-            # Fade in
-            self._fade_channel_in(0, self.drone_fade_in)
+            # Fade in (unless skipping fades for global fade-in)
+            if not skip_fades:
+                self._fade_channel_in(0, self.drone_fade_in)
 
         # Stop notes that should no longer play (with fade out)
         to_stop = self.active_notes - new_notes - {drone}
         for note in sorted(to_stop):
             channel = self._allocate_channel(note)
-            # Fade out before stopping
-            self._fade_channel_out(channel, self.note_fade_out)
+            # Fade out before stopping (unless skipping fades)
+            if not skip_fades:
+                self._fade_channel_out(channel, self.note_fade_out)
             self._send_note_off(note, channel)
             self.active_notes.discard(note)
             stopped_notes.append((note, channel))
@@ -410,8 +418,9 @@ class MIDIPerformer:
             self._send_note_on(note, channel)
             self.active_notes.add(note)
             started_notes.append((note, channel))
-            # Fade in after starting
-            self._fade_channel_in(channel, self.note_fade_in)
+            # Fade in after starting (unless skipping fades for global fade-in)
+            if not skip_fades:
+                self._fade_channel_in(channel, self.note_fade_in)
 
         return stopped_notes, started_notes
 
@@ -460,7 +469,10 @@ class MIDIPerformer:
 
                 # Update playing notes
                 notes_set = set(bracket.notes)
-                stopped_notes, started_notes = self._update_notes(notes_set, bracket.drone)
+                # Skip individual note fades if we're in the global fade-in period
+                current_time = time.time() - start_time
+                skip_fades = fade_in > 0 and current_time < fade_in
+                stopped_notes, started_notes = self._update_notes(notes_set, bracket.drone, skip_fades)
 
                 # Print the bracket change
                 actual_time = time.time() - start_time
