@@ -1,5 +1,7 @@
 # Disquiet Junto 364: Casting Drones
 
+## First, the original:
+
 This script, when run, generates a "score" for a drone for the Disquiet Junto's
 "Casting Drones" project. The score is made up of _brackets_, each 1 to 3 minutes
 long. Each bracket describes what should be happening during that bracket. Notes
@@ -59,3 +61,19 @@ Output looks similar to this (remember the score is randomly generated):
 					Change 3 notes: E4 (drop F#5) D4 (drop D3) D5 (drop C5)
 		19:00 Playing C (drone) + D4 E4 D5 for 1 minute
 		20:00 fade out
+
+## Now, the update:
+
+I pulled out this script because I wanted to create a generative background for a long improvisation for RadioSpiral's _Ice Queen's Ball_, January 3, 2026.
+
+I looked at it and it was..._okay_, but not what I really wanted. What I wanted was 16 channels in real time, controlling channels in Ableton Live. So I sat
+down with Claude and modernized it.
+
+ - Instead of producing a score, the script now generates the MIDI in realtime!
+ - I went back and forth quite a bit on getting the effect I wanted, but the final version works well:
+   - can score a "bassline" (MIDI channel 1) on the command line and set the duration of the notes
+   - set an overall duration for the piece
+   - have it fade in and out, with a selectable duration
+
+The script, when run, creates a MIDI device, Drone Performer, that you can select in Live to get MIDI events; it generates up to 16 channels of drone,
+but carefully adjusts the addition and removal of the voices, just like the original, and handles fading them in and out so there's no herky-jerky feel.
